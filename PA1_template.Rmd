@@ -7,14 +7,65 @@ output:
 
 
 ## Loading and preprocessing the data
+```{r, echo=TRUE}
+library(dplyr)
+if (!file.exists("activity.csv")){
+  unzip("activity.zip")
+}
+
+dtAct <- read.csv("activity.csv", header = TRUE, sep = ",")
+##, na.strings="?") 
+dtValAct <- subset(dtAct, !is.na(steps))
+dtValAct$date <- as.Date(dtValAct$date,"%Y-%m-%d")
+```
 
 
 
 ## What is mean total number of steps taken per day?
+```{r, echo=TRUE}
+library(dplyr)
+dlysum <- aggregate(steps ~ date, dtValAct, sum)
+
+#dlysum <- with(dtValAct, tapply(steps, date, sum, na.rm=TRUE))
+
+
+hist(dlysum$steps,
+     col = "blue",
+     xlab = "Dates", 
+     main = "Daily Steps")
+
+#install.packages("xtable")
+library(xtable)
+
+dlymean <- aggregate(steps ~ date, dtValAct, mean)
+dlymdn <- aggregate(steps ~ date, dtValAct, median)
+
+dlymm <- cbind(dlymean, dlymdn$steps)
+names(dlymm) <- c("Date", "Mean", "Median")
+
+print(dlymm, type="html")
+
+rm(dlymdn)
+
+```
 
 
 
 ## What is the average daily activity pattern?
+```{r, echo=TRUE}
+#Combine daily activity and average
+
+dlyActMean <- cbind(dtValAct, dlymean$steps)
+names(dlyActMean) <- c("steps", "Date", "time", "Mean")
+
+with(dlyActMean, {
+  plot(as.numeric(Mean)~steps, type="l",
+       ylab="Average Daily activity pattern", xlab="")
+})
+
+#rm(dlyActMean)
+#rm(dlymean)
+```
 
 
 
