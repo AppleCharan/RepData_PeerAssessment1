@@ -13,22 +13,25 @@ if (!file.exists("activity.csv")){
   unzip("activity.zip")
 }
 
+#Read all data  
 dtAct <- read.csv("activity.csv", header = TRUE, sep = ",")
 ##, na.strings="?") 
+
+#Ignore NA values 
 dtValAct <- subset(dtAct, !is.na(steps))
 dtValAct$date <- as.Date(dtValAct$date,"%Y-%m-%d")
 ```
 
 
-
 ## What is mean total number of steps taken per day?
 ```{r, echo=TRUE}
 library(dplyr)
-dlysum <- aggregate(steps ~ date, dtValAct, sum)
 
+#Daily total steps
+dlysum <- aggregate(steps ~ date, dtValAct, sum)
 #dlysum <- with(dtValAct, tapply(steps, date, sum, na.rm=TRUE))
 
-
+#Histogram for daily steps
 hist(dlysum$steps,
      col = "blue",
      xlab = "Dates", 
@@ -37,24 +40,28 @@ hist(dlysum$steps,
 #install.packages("xtable")
 library(xtable)
 
-dlymean <- aggregate(steps ~ date, dtValAct, mean)
-dlymdn <- aggregate(steps ~ date, dtValAct, median)
+#dlymdn <- aggregate(steps ~ date, dtValAct, median)
+#dlymean <- aggregate(steps ~ date, dtValAct, mean)
+#dlymm <- cbind(dlymean, dlymdn$steps)
+#names(dlymm) <- c("Date", "Mean", "Median")
 
-dlymm <- cbind(dlymean, dlymdn$steps)
-names(dlymm) <- c("Date", "Mean", "Median")
+dlymm <- dtValAct%>%
+          group_by(Date=date)%>% 
+          summarise(Mean=mean(steps), Median=median(steps))
 
 print(dlymm, type="html")
 
-rm(dlymdn)
+#rm(dlymdn)
 
 ```
 
 
-
 ## What is the average daily activity pattern?
 ```{r, echo=TRUE}
-#Combine daily activity and average
+#Daily Average steps
+dlymean <- aggregate(steps ~ date, dtValAct, mean)
 
+#Combine daily activity and average
 dlyActMean <- cbind(dtValAct, dlymean$steps)
 names(dlyActMean) <- c("steps", "Date", "time", "Mean")
 
@@ -68,9 +75,18 @@ with(dlyActMean, {
 ```
 
 
-
 ## Imputing missing values
+```{r, echo=TRUE}
+#Dataset dtAct contains all rows, replaces NA with mean value for day
+#First count NA values
+totNA <- sum(is.na(dtAct))
+```
+
+The total number of NAs i.e. missings values are: `r totNA`
+
+```{r, echo=TRUE}
 
 
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
