@@ -51,9 +51,6 @@ median(dlysum$steps)
 
 ## What is the average daily activity pattern?
 ```{r, echo=TRUE}
-#Daily Average steps
-#dlymean <- aggregate(steps ~ date, dtValAct, mean)
-
 #Average steps by intervals
 dlyActMean <- aggregate(steps ~ interval, dtValAct, mean)
 names(dlyActMean) <- c("interval", "Mean")
@@ -71,7 +68,8 @@ with(dlyActMean, {
 
 ##5. The 5-minute interval that, on average, contains the maximum number of steps
 ```{r, echo=TRUE}
-maxMean <- dlyActMean[which.max(dlyActMean$mean), ]$interval
+maxMean <- dlyActMean[which.max(dlyActMean$Mean), ]$interval
+maxMean
 ```
 The 5-minute interval that, on average, contains the maximum number of steps: `r maxMean`
 
@@ -82,6 +80,7 @@ The 5-minute interval that, on average, contains the maximum number of steps: `r
 #Dataset dtAct contains all rows, replaces NA with mean value for day
 #First count NA values
 totNA <- sum(is.na(dtAct))
+totNA
 ```
 
 The total number of NAs i.e. missings values are: `r totNA`
@@ -152,5 +151,8 @@ library(lattice)
 xyplot(steps ~ interval | daytype, DayTypeMean, type = "l", layout = c(1, 2), 
     xlab = "Interval", ylab = "Number of steps")
 
+#Remove all datasets from memory
 
+rm(dlyActivity, dlyActMean, dlysum, dlysum2)
+rm(dtValAct, dtAct)
 ```
